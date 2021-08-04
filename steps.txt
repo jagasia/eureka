@@ -1,0 +1,99 @@
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+
+
+
+Steps for creating Eureka Server application:
+1) create a spring boot starter application and choose "Eureka Server" in dependencies
+2) In application class where main method is there
+	below @SpringBootApplication, add the following annotation
+		@EnableEurekaServer
+3) in application.properties file, add the following:
+	eureka.client.registerWithEureka = false
+	eureka.client.fetchRegistry = false
+	server.port = 8761
+4) update project and run as spring boot application
+
+5) check localhost:8761
+------------------
+Steps for creating Eureka Client application:
+1) create a spring boot starter application and choose "Eureka Discovery Clinet" and "Spring Web" in dependencies
+the following dependencies will be added to pom.xml automatically:
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+2) In application (main) class add the below dependencies:
+	
+	@SpringBootApplication
+	@EnableEurekaClient
+
+
+3) 	define @RestController with request mappings
+
+@SpringBootApplication
+@EnableEurekaClient
+@RestController
+public class EurekaClient1Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(EurekaClient1Application.class, args);
+	}
+	
+	@GetMapping("/")
+	public String home()
+	{
+		return "Jag welcomes you to eureka client application";
+	}
+
+}
+
+4) application.properties
+	
+server.port=8383
+spring.application.name=account-service
+eureka.instance.hostname=localhost
+eureka.client.serviceUrl.defaultZone=http://${eureka.instance.hostname}:8761/eureka/
+server.context-path=/account
+
+5) check localhost:8383
+
+6) In Rest controller class,
+	@Autowired
+	EurekaClient eurekaClient;
+
+and create a method
+	@GetMapping("/applications")
+	public Applications getApplications()
+	{
+		return eurekaClient.getApplications();
+	}
+
+7) restart the app and check
+
+	localhost:8383/applications
+
+we get the meta data of the information about our instances
+
+   <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
